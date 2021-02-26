@@ -5,14 +5,18 @@ from flask_cors import CORS
 import belief_helper
 
 # The flask api for serving endpoints
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='', 
+            static_folder='/app/static')
 CORS(app)
 
 @app.route('/', methods=['GET'])
+def index():
+    return redirect("/index.html")
+
 @app.route('/health_check', methods=['GET'])
 def ping():
     """ Healthcheck """
-    return jsonify({"success": True}), 200
+    return "ok", 200
 
 @app.route('/beliefs', methods=['POST'])
 def remember_belief():

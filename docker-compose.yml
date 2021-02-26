@@ -7,7 +7,7 @@ services:
     command:
       - "./serve"
     ports:
-      - "9030:8080"
+      - "8080:8080"
     networks: 
       - system-of-beliefs-internal
       
