@@ -20,14 +20,15 @@ def ping():
 
 @app.route('/beliefs', methods=['POST'])
 def remember_belief():
-    belief_text = request.get_data()
-    err, belief_obj = belief_helper.validate(belief_text)
-    belief_helper.remember_belief(belief_text)
+    belief_text = request.get_data().decode("utf-8")
+    err, belief_id, entity_id, signature, claims = belief_helper.validate(belief_text)
     if err: return err, 422
-    return belief, 200
+    err = belief_helper.remember_belief(belief_id, belief_text)
+    if err: return err, 422
+    return belief_text, 200
 
 @app.route('/beliefs/<belief_id>', methods=['GET'])
-def get_belief(belief_id):
+def get_belief(belief_id:str):
     err, presigned_url = belief_helper.get_belief(belief_id)
     if err: return err, 422
     return redirect(presigned_url)
