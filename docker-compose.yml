@@ -1,0 +1,43 @@
+version: "3"
+
+services:
+  system_of_beliefs:
+    build: .
+    env_file: .env
+    command:
+      - "./serve"
+    ports:
+      - "9030:8080"
+    networks: 
+      - system-of-beliefs-internal
+      
+  minio:
+    image: minio/minio
+    command: server /export
+    environment:
+      - MINIO_ACCESS_KEY=admin
+      - MINIO_SECRET_KEY=password
+      - MINIO_HTTP_TRACE=output.log
+      - MINIO_REGION_NAME=us-east-2
+    networks:
+      - system-of-beliefs-internal
+    ports:
+      - 9000:9000
+    volumes:
+      - .minio/data:/export
+    
+  create-minio-buckets:
+    image: minio/mc
+    networks:
+      - system-of-beliefs-internal
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc config host add myminio http://minio:9000 admin password &&
+      /usr/bin/mc mb --ignore-existing myminio/system_of_beliefs &&
+      /usr/bin/mc rm -r --force myminio/system_of_beliefs" 
+
+networks:
+  system-of-beliefs-internal:
+    external: true

@@ -1,0 +1,5 @@
+flask
+gevent
+gunicorn
+flask-cors
+minio
